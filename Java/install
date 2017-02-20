@@ -1,0 +1,3 @@
+sudo cp ~/dev/VisionBuildSamples/Java/output/CameraVision-all.jar /opt/team1635
+sudo cp ~/dev/VisionBuildSamples/Java/output/CameraVision.zip /opt/team1635
+sudo cp ~/dev/VisionBuildSamples/Java/output/*.so /opt/team1635
