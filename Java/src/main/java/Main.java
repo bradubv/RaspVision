@@ -18,7 +18,6 @@ public class Main {
 
     NetworkTable.initialize();
 
-
     // This is the network port you want to stream the raw received image to
     // By rules, this has to be between 1180 and 1190, so 1185 is a good choice
     int streamPort = 1185;
@@ -28,9 +27,11 @@ public class Main {
 
     // Selecting a Camera
     // Uncomment one of the 2 following camera options
-    // The top one receives a stream from another device, and performs operations based on that
+    // The top one receives a stream from another device, 
+    // and performs operations based on that
     // On windows, this one must be used since USB is not supported
-    // The bottom one opens a USB camera, and performs operations on that, along with streaming
+    // The bottom one opens a USB camera, and performs operations on 
+    // that, along with streaming
     // the input image so other devices can see it.
 
     // HTTP Camera
@@ -40,24 +41,24 @@ public class Main {
     // "USB Camera 0" is the default if no string is specified
     String cameraName = "USB Camera 0";
     HttpCamera camera = setHttpCamera(cameraName, inputStream);
-    // It is possible for the camera to be null. If it is, that means no camera could
-    // be found using NetworkTables to connect to. Create an HttpCamera by giving a specified stream
+    // It is possible for the camera to be null. 
+    // If it is, that means no camera could
+    // be found using NetworkTables to connect to. 
+    // Create an HttpCamera by giving a specified stream
     // Note if this happens, no restream will be created
     if (camera == null) {
       camera = new HttpCamera("CoprocessorCamera", "YourURLHere");
       inputStream.setSource(camera);
     }
     */
-    
-      
 
     /***********************************************/
-
     // USB Camera
     // This gets the image from a USB camera 
     // Usually this will be on device 0, but there are other overloads
     // that can be used
     UsbCamera camera = setUsbCamera(0, inputStream);
+
     // Set the resolution for our camera, since this is over USB
     camera.setResolution(640,480);
 
@@ -66,9 +67,10 @@ public class Main {
     CvSink imageSink = new CvSink("CV Image Grabber");
     imageSink.setSource(camera);
 
-    // This creates a CvSource to use. This will take in a Mat image that has had OpenCV operations
-    // operations 
-    CvSource imageSource = new CvSource("CV Image Source", VideoMode.PixelFormat.kMJPEG, 640, 480, 30);
+    // This creates a CvSource to use. This will take in a Mat image that 
+    // has had OpenCV operations 
+    CvSource imageSource = new CvSource("CV Image Source", 
+        VideoMode.PixelFormat.kMJPEG, 640, 480, 30);
     MjpegServer cvStream = new MjpegServer("CV Image Stream", 1186);
     cvStream.setSource(imageSource);
 
@@ -84,14 +86,16 @@ public class Main {
       long frameTime = imageSink.grabFrame(inputImage);
       if (frameTime == 0) continue;
 
-      // Below is where you would do your OpenCV operations on the provided image
+      // Below is where you would do your OpenCV operations 
+      // on the provided image
       // The sample below just changes color source to HSV
       Imgproc.cvtColor(inputImage, hsv, Imgproc.COLOR_BGR2HSV);
 
       // Here is where you would write a processed image that you want to restreams
       // This will most likely be a marked up image of what the camera sees
       // For now, we are just going to stream the HSV image
-      imageSource.putFrame(hsv);
+      //imageSource.putFrame(hsv);
+      imageSource.putFrame(inputImage);
     }
   }
 
