@@ -21,10 +21,12 @@ public class Main {
     // This is the network port you want to stream the raw received image to
     // By rules, this has to be between 1180 and 1190, so 1185 is a good choice
     int streamPort = 1185;
+    int climbCameraPort = 1187;
 
     // This stores our reference to our mjpeg server for streaming the input 
     // image
     MjpegServer inputStream = new MjpegServer("MJPEG Server", streamPort);
+    MjpegServer climbStream = new MjpegServer("Climb Server", climbCameraPort);
 
     // On windows, http must be used since USB is not supported
     // On the pi we're using USB cameras. 
@@ -33,17 +35,22 @@ public class Main {
     // This gets the image from a USB camera 
     // Usually this will be on device 0, but there are other overloads
     // that can be used
-    UsbCamera camera = setUsbCamera(0, inputStream);
+    UsbCamera camera = setUsbCamera(0, "frontCamera", inputStream);
+    UsbCamera climbCamera = setUsbCamera(1, "climbCamera", climbStream);
 
     // Set the resolution for our camera, since this is over USB
     //camera.setResolution(640,480); //getting ~8 FPS on the PI at this res
-    camera.setResolution(320,240); //still getting 8 FPS
+    camera.setResolution(320,240); 
     camera.setFPS(24);
+    climbCamera.setResolution(320,240); 
+    climbCamera.setFPS(24);
 
     // This creates a CvSink for us to use. This grabs images from our 
     // selected camera and will allow us to use those images in opencv
     CvSink imageSink = new CvSink("CV Image Grabber");
     imageSink.setSource(camera);
+    CvSink imageSinkClimb = new CvSink("ClimbCamera Image Grabber");
+    imageSinkClimb.setSource(climbCamera);
 
     // This creates a CvSource to use. This will take in a Mat image that 
     // has had OpenCV operations 
@@ -66,7 +73,8 @@ public class Main {
     while (true) {
       // Grab a frame. If it has a frame time of 0, there was an error.
       // Just skip and continue
-      long frameTime = imageSink.grabFrame(inputImage);
+      //long frameTime = imageSink.grabFrame(inputImage);
+      long frameTime = imageSinkClimb.grabFrame(inputImage);
       if (frameTime == 0) continue;
 
       // Below is where you would do your OpenCV operations 
@@ -90,11 +98,12 @@ public class Main {
     
   }
 
-  private static UsbCamera setUsbCamera(int cameraId, MjpegServer server) {
+  private static UsbCamera setUsbCamera(int cameraId, 
+    String cameraName, MjpegServer server) {
     // This gets the image from a USB camera 
     // Usually this will be on device 0, but there are other overloads
     // that can be used
-    UsbCamera camera = new UsbCamera("CoprocessorCamera", cameraId);
+    UsbCamera camera = new UsbCamera(cameraName, cameraId);
     server.setSource(camera);
     return camera;
   }
