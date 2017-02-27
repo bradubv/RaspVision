@@ -1,5 +1,4 @@
 import java.util.ArrayList;
-
 import edu.wpi.first.wpilibj.networktables.*;
 import edu.wpi.first.wpilibj.tables.*;
 import edu.wpi.cscore.*;
@@ -7,6 +6,7 @@ import org.opencv.core.Mat;
 import org.opencv.imgproc.Imgproc;
 
 public class Main {
+
   public static void main(String[] args) {
     // Loads our OpenCV library. This MUST be included
     System.loadLibrary("opencv_java310");
@@ -16,6 +16,7 @@ public class Main {
     // Set your team number here
     NetworkTable.setTeam(1635);
     NetworkTable.initialize();
+    NetworkTable nt = NetworkTable.getTable("SmartDashboard");
 
     // This is the network port you want to stream the raw received image to
     // By rules, this has to be between 1180 and 1190, so 1185 is a good choice
@@ -48,7 +49,7 @@ public class Main {
     // has had OpenCV operations 
     CvSource imageSource = new CvSource("CV Image Source", 
     //    VideoMode.PixelFormat.kMJPEG, 640, 480, 30);
-        VideoMode.PixelFormat.kMJPEG, 320, 240, 24);
+    VideoMode.PixelFormat.kMJPEG, 320, 240, 24);
     MjpegServer cvStream = new MjpegServer("CV Image Stream", 1186);
     cvStream.setSource(imageSource);
 
@@ -56,7 +57,11 @@ public class Main {
     // as they are expensive to create
     Mat inputImage = new Mat();
     Mat hsv = new Mat();
-
+    
+    Sonar sonar = new Sonar();
+    Thread distThread = new Thread(sonar);
+    distThread.start();
+    
     // Infinitely process image
     while (true) {
       // Grab a frame. If it has a frame time of 0, there was an error.
@@ -76,7 +81,13 @@ public class Main {
       // For now, we are just going to stream the HSV image
       //imageSource.putFrame(hsv);
       imageSource.putFrame(inputImage);
+
+      double distance = sonar.getDistance();  
+      nt.putNumber("Sonar Distance", distance);
     }
+    //TODO: figure out how to release the GPIO pins
+    // gpio.shutdown();
+    
   }
 
   private static UsbCamera setUsbCamera(int cameraId, MjpegServer server) {
@@ -87,4 +98,5 @@ public class Main {
     server.setSource(camera);
     return camera;
   }
+
 }
