@@ -7,6 +7,7 @@ import org.opencv.imgproc.Imgproc;
 
 public class Main {
 
+  private boolean forwardCameraOn;
   public static void main(String[] args) {
     // Loads our OpenCV library. This MUST be included
     System.loadLibrary("opencv_java310");
@@ -73,8 +74,12 @@ public class Main {
     while (true) {
       // Grab a frame. If it has a frame time of 0, there was an error.
       // Just skip and continue
-      //long frameTime = imageSink.grabFrame(inputImage);
-      long frameTime = imageSinkClimb.grabFrame(inputImage);
+      long frameTime;
+      if (forwardCameraOn) {
+          frameTime = imageSinkClimb.grabFrame(inputImage);
+      } else {
+          frameTime = imageSink.grabFrame(inputImage);    	  
+      }
       if (frameTime == 0) continue;
 
       // Below is where you would do your OpenCV operations 
@@ -92,6 +97,7 @@ public class Main {
 
       double distance = sonar.getDistance();  
       nt.putNumber("Sonar Distance", distance);
+      forwardCameraOn = nt.getBoolean("forwardCameraOn", true);
     }
     //TODO: figure out how to release the GPIO pins
     // gpio.shutdown();
