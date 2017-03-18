@@ -7,7 +7,8 @@ import org.opencv.imgproc.Imgproc;
 
 public class Main {
 
-  private boolean forwardCameraOn;
+  private static boolean forwardCameraOn;
+
   public static void main(String[] args) {
     // Loads our OpenCV library. This MUST be included
     System.loadLibrary("opencv_java310");
