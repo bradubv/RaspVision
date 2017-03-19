@@ -4,14 +4,22 @@ import edu.wpi.first.wpilibj.tables.*;
 import edu.wpi.cscore.*;
 import org.opencv.core.Mat;
 import org.opencv.imgproc.Imgproc;
+import org.team1635.vision.VisionPipeline;
 
 public class Main {
 
-  private static boolean forwardCameraOn;
+  private static boolean forwardCameraOn = true;
+  private static boolean processImage = true;
 
   public static void main(String[] args) {
     // Loads our OpenCV library. This MUST be included
     System.loadLibrary("opencv_java310");
+
+    // Setup the filter for the VisionPipeline
+    // Find the values by experimenting with bradubv/OpenCVTutorial
+    double[] hueRange = { 0.0, 173.0 };
+    double[] satRange = { 0.0, 32.0 };
+    double[] valRange = { 249.0, 255.0 };
 
     // Connect NetworkTables, and get access to the publishing table
     NetworkTable.setClientMode();
@@ -83,26 +91,29 @@ public class Main {
       }
       if (frameTime == 0) continue;
 
-      // Below is where you would do your OpenCV operations 
-      // on the provided image
-      // The sample below just changes color source to HSV
-      // Bogdan: TODO: this is where we put our processing code
-      //Imgproc.cvtColor(inputImage, hsv, Imgproc.COLOR_BGR2HSV);
+      if (forwardCameraOn && processImage) {
+        // Do OpenCV operations on the provided image
+        VisionPipeline pipeline = new VisionPipeline();
+        pipeline.setFilter(hueRange, satRange, valRange);
+        pipeline.process(inputImage);
+        nt.putNumber("VisionTargetCount", pipeline.getTargetCandidateCount());
+        nt.putBoolean("VisionTargetAcquired", pipeline.getTargetAcquired());
+        nt.putNumber("VisionDistrance", pipeline.getDistance());
+        nt.putNumber("VisionError", pipeline.getError());
+      }
 
-      // Here is where you would write a processed image that you want 
-      // to restreams
-      // This will most likely be a marked up image of what the camera sees
-      // For now, we are just going to stream the HSV image
-      //imageSource.putFrame(hsv);
+      // Write the image that you want to restream
       imageSource.putFrame(inputImage);
 
       double distance = sonar.getDistance();  
       nt.putNumber("Sonar Distance", distance);
+
+      //read values from the SmartDashboard
       forwardCameraOn = nt.getBoolean("forwardCameraOn", true);
+      processImage = nt.getBoolean("processImage", true);
     }
     //TODO: figure out how to release the GPIO pins
     // gpio.shutdown();
-    
   }
 
   private static UsbCamera setUsbCamera(int cameraId, 
