@@ -74,6 +74,11 @@ public class Main {
     // as they are expensive to create
     Mat inputImage = new Mat();
     Mat hsv = new Mat();
+    Point targetLeftTop = new Point(205, 104); 
+    Point targetLeftBot = new Point(205, 121); 
+    Point targetRightBot = new Point(286, 121); 
+    Point targetRightTop = new Point(286, 104); 
+    Scalar orange = new Scalar(255, 127, 39));
     
     Sonar sonar = new Sonar();
     Thread distThread = new Thread(sonar);
@@ -93,13 +98,23 @@ public class Main {
 
       if (forwardCameraOn && processImage) {
         // Do OpenCV operations on the provided image
-        VisionPipeline pipeline = new VisionPipeline();
-        pipeline.setFilter(hueRange, satRange, valRange);
-        pipeline.process(inputImage);
-        nt.putNumber("VisionTargetCount", pipeline.getTargetCandidateCount());
-        nt.putBoolean("VisionTargetAcquired", pipeline.getTargetAcquired());
-        nt.putNumber("VisionDistrance", pipeline.getDistance());
-        nt.putNumber("VisionError", pipeline.getError());
+	try {
+          VisionPipeline pipeline = new VisionPipeline();
+          pipeline.setFilter(hueRange, satRange, valRange);
+          pipeline.process(inputImage);
+          nt.putNumber("VisionTargetCount", pipeline.getTargetCandidateCount());
+          nt.putBoolean("VisionTargetAcquired", pipeline.getTargetAcquired());
+          nt.putNumber("VisionDistrance", pipeline.getDistance());
+          nt.putNumber("VisionError", pipeline.getError());
+        } catch (Exception ex) {
+	  System.out.println("Error: VisionPipeline crashed: ex.Message());
+	}
+      }
+
+      if (forwardCameraOn) {
+        Imgproc.line(inputImage, targetLeftTop, targetLeftBot, orange);
+        Imgproc.line(inputImage, targetLeftBot, targetRightBot, orange);
+        Imgproc.line(inputImage, targetRightBot, targetRightTop, orange);
       }
 
       // Write the image that you want to restream
