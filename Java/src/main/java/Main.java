@@ -3,6 +3,8 @@ import edu.wpi.first.wpilibj.networktables.*;
 import edu.wpi.first.wpilibj.tables.*;
 import edu.wpi.cscore.*;
 import org.opencv.core.Mat;
+import org.opencv.core.Point;
+import org.opencv.core.Scalar;
 import org.opencv.imgproc.Imgproc;
 import org.team1635.vision.VisionPipeline;
 
@@ -78,7 +80,7 @@ public class Main {
     Point targetLeftBot = new Point(205, 121); 
     Point targetRightBot = new Point(286, 121); 
     Point targetRightTop = new Point(286, 104); 
-    Scalar orange = new Scalar(255, 127, 39));
+    Scalar orange = new Scalar(255, 127, 39);
     
     Sonar sonar = new Sonar();
     Thread distThread = new Thread(sonar);
@@ -107,7 +109,8 @@ public class Main {
           nt.putNumber("VisionDistrance", pipeline.getDistance());
           nt.putNumber("VisionError", pipeline.getError());
         } catch (Exception ex) {
-	  System.out.println("Error: VisionPipeline crashed: ex.Message());
+	  System.out.println("Error: VisionPipeline crashed: " + ex.getMessage());
+	  ex.printStackTrace();
 	}
       }
 
