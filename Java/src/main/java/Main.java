@@ -80,7 +80,7 @@ public class Main {
     Point targetLeftBot = new Point(205, 121); 
     Point targetRightBot = new Point(286, 121); 
     Point targetRightTop = new Point(286, 104); 
-    Scalar orange = new Scalar(255, 127, 39);
+    Scalar orange = new Scalar(0, 165, 255);
     
     Sonar sonar = new Sonar();
     Thread distThread = new Thread(sonar);
@@ -106,7 +106,7 @@ public class Main {
           pipeline.process(inputImage);
           nt.putNumber("VisionTargetCount", pipeline.getTargetCandidateCount());
           nt.putBoolean("VisionTargetAcquired", pipeline.getTargetAcquired());
-          nt.putNumber("VisionDistrance", pipeline.getDistance());
+          nt.putNumber("VisionDistance", pipeline.getDistance());
           nt.putNumber("VisionError", pipeline.getError());
         } catch (Exception ex) {
 	  System.out.println("Error: VisionPipeline crashed: " + ex.getMessage());
@@ -115,9 +115,9 @@ public class Main {
       }
 
       if (forwardCameraOn) {
-        Imgproc.line(inputImage, targetLeftTop, targetLeftBot, orange);
-        Imgproc.line(inputImage, targetLeftBot, targetRightBot, orange);
-        Imgproc.line(inputImage, targetRightBot, targetRightTop, orange);
+        Imgproc.line(inputImage, targetLeftTop, targetLeftBot, orange, 2);
+        Imgproc.line(inputImage, targetLeftBot, targetRightBot, orange, 2);
+        Imgproc.line(inputImage, targetRightBot, targetRightTop, orange, 2);
       }
 
       // Write the image that you want to restream
