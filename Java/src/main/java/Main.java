@@ -76,10 +76,19 @@ public class Main {
     // as they are expensive to create
     Mat inputImage = new Mat();
     Mat hsv = new Mat();
-    Point targetLeftTop = new Point(205, 104); 
-    Point targetLeftBot = new Point(205, 121); 
-    Point targetRightBot = new Point(286, 121); 
-    Point targetRightTop = new Point(286, 104); 
+
+    //Practice Bot camera needs this target tracking
+    //Point targetLeftTop = new Point(205, 104); 
+    //Point targetLeftBot = new Point(205, 121); 
+    //Point targetRightBot = new Point(286, 121); 
+    //Point targetRightTop = new Point(286, 104); 
+
+    //2017 Competition robot needs this target tracking
+    Point targetLeftTop = new Point(183, 79); 
+    Point targetLeftBot = new Point(183, 62); 
+    Point targetRightBot = new Point(248, 62); 
+    Point targetRightTop = new Point(248, 79); 
+
     Scalar orange = new Scalar(0, 165, 255);
     
     Sonar sonar = new Sonar();

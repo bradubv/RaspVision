@@ -23,7 +23,8 @@ public class VisionPipeline {
 	private ArrayList<MatOfPoint> findContoursOutput = new ArrayList<MatOfPoint>();
 	private ArrayList<MatOfPoint> filterContoursOutput = new ArrayList<MatOfPoint>();
 	private ArrayList<MatOfPoint> convexHullsOutput = new ArrayList<MatOfPoint>();
-	protected ArrayList<MatOfPoint2f> aproxPolysOutput = new ArrayList<MatOfPoint2f>();	
+	protected ArrayList<MatOfPoint2f> aproxPolysOutput = new ArrayList<MatOfPoint2f>();
+	protected List<Quadrilateral> quads = new ArrayList<Quadrilateral>();
 
 	private int angle;
 	private Quadrilateral leftStrip;
@@ -59,9 +60,11 @@ public class VisionPipeline {
 		// Step Filter_Contours0:
 		ArrayList<MatOfPoint> filterContoursContours = findContoursOutput;
 		double filterContoursMinArea = 0.0;
-//		double filterContoursMinPerimeter = 75.0;  //didn't work from afar
-//		double filterContoursMinPerimeter = 60.0;  //doesn't pick up target from 83 inches away.
-		double filterContoursMinPerimeter = 50.0;  //doesn't pick up target from 83 inches away.
+		// double filterContoursMinPerimeter = 75.0; //didn't work from afar
+		// double filterContoursMinPerimeter = 60.0; //doesn't pick up target
+		// from 83 inches away.
+		double filterContoursMinPerimeter = 50.0; // doesn't pick up target from
+													// 83 inches away.
 		double filterContoursMinWidth = 0.0;
 		double filterContoursMaxWidth = 1000.0;
 		double filterContoursMinHeight = 0.0;
@@ -149,10 +152,10 @@ public class VisionPipeline {
 		double[] hueFilterRange = filter[0];
 		double[] satFilterRange = filter[1];
 		double[] valFilterRange = filter[2];
-		
+
 		Scalar minFilterVals = new Scalar(hueFilterRange[0], satFilterRange[0], valFilterRange[0]);
 		Scalar maxFilterVals = new Scalar(hueFilterRange[1], satFilterRange[1], valFilterRange[1]);
-		
+
 		// TODO: there is probably no need for this tmpMat. Was put in due to
 		// get(x, y ...) bug
 		Mat tmpMat = new Mat(new Size(320, 240), CvType.CV_8UC3);
@@ -164,10 +167,11 @@ public class VisionPipeline {
 	}
 
 	/**
-	 * Override this in your debug class to print things from the
-	 * HSV converted image and before we write the greyscale image 
-	 * on top of it 
-	 * @param img Image to be scanned for value ranges
+	 * Override this in your debug class to print things from the HSV converted
+	 * image and before we write the greyscale image on top of it
+	 * 
+	 * @param img
+	 *            Image to be scanned for value ranges
 	 */
 	protected void setRanges(Mat img) {
 	}
@@ -293,10 +297,12 @@ public class VisionPipeline {
 
 	/**
 	 * For each contour detected approximate a polygon to reduce the number of
-     * vertices
-     * 
-	 * @param contours The array of contours
-	 * @param polys The array of polygons
+	 * vertices
+	 * 
+	 * @param contours
+	 *            The array of contours
+	 * @param polys
+	 *            The array of polygons
 	 */
 	private void approxPolys(ArrayList<MatOfPoint> contours, ArrayList<MatOfPoint2f> polys) {
 		for (int i = 0; i < contours.size(); i++) {
@@ -314,7 +320,7 @@ public class VisionPipeline {
 	}
 
 	public void findStrips(ArrayList<MatOfPoint2f> polys) {
-		List<Quadrilateral> quads = new ArrayList<Quadrilateral>();
+
 
 		for (int i = 0; i < polys.size(); i++) {
 			MatOfPoint2f poly = polys.get(i);
@@ -326,7 +332,11 @@ public class VisionPipeline {
 				if (quad.isDenaturated()) {
 					System.out.println("debug: Denaturated quad detected, skipping");
 				} else {
-					quads.add(quad);
+					
+					if ((quad.getHeight() > 40) ||
+							(quad.getHeight() > quad.getWidth() * 1.5)) {
+						quads.add(quad);
+					}
 				}
 			} else {
 				System.out.println("debug: Shape has " + poly.rows() + " vertices, not 4 or 5, skipping");
@@ -377,7 +387,7 @@ public class VisionPipeline {
 	public boolean getTargetAcquired() {
 		return targetAcquired;
 	}
-	
+
 	public int getDistance() {
 		if (targetAcquired) {
 			return leftStrip.getWidth();
@@ -385,7 +395,7 @@ public class VisionPipeline {
 			return 0;
 		}
 	}
-	
+
 	public int getError() {
 		if (targetAcquired) {
 			return (int) (160.0 - leftStrip.getBottomLeft().x);
@@ -408,6 +418,5 @@ public class VisionPipeline {
 		}
 		return retVal;
 	}
-
 
 }
