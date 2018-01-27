@@ -42,3 +42,8 @@ to run a pipeline generated from GRIP. In addition, a connection to NetworkTable
 ## Other configuration options
 The build script provides a few other configuration options. These include selecting the main class name, and providing an output name for the project.
 Please see the `build.gradle` file for where to change these. 
+
+## Running on boot
+Add to your /etc/rc.local script the command that will run this code.  In our case take a look at the install script to be run after every build, but the command to be added needs to be:
+
+`/opt/team1635/runCameraVision`
