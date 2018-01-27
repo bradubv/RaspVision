@@ -1,0 +1,1 @@
+java -Djava.library.path=/opt/team1635/ -jar /opt/team1635/CameraVision-all.jar -cp .:/opt/pi4j/lib/pi4j-core.jar
