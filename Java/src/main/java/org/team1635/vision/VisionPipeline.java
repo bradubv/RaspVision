@@ -333,8 +333,9 @@ public class VisionPipeline {
 					System.out.println("debug: Denaturated quad detected, skipping");
 				} else {
 					
-					if ((quad.getHeight() > 40) ||
-							(quad.getHeight() > quad.getWidth() * 1.5)) {
+					if (((quad.getHeight() > 40) ||
+							(quad.getHeight() > quad.getWidth() * 1.5))
+						&& (quad.getWidth() + 5 > quad.getHeight() * 2.0 / 5.0)) {
 						quads.add(quad);
 					}
 				}
